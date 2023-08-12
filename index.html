@@ -20,7 +20,7 @@
     <script>
       if('serviceWorker' in navigator){
         window.addEventListener('load', ()=>{
-          navigator.serviceWorker.register('./serviceworker.js`')
+          navigator.serviceWorker.register('https://rainbow-genie-136c82.netlify.app/serviceworker.js')
           .then((reg)=> console.log("success: ", reg.scope))
           .catch((err)=> console.log("failure: ", err))
         })
