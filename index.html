@@ -18,9 +18,9 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      if('serviceWorkerContainer' in navigator){
+      if('serviceWorker' in navigator){
         window.addEventListener('load', ()=>{
-          navigator.serviceWorkerContainer.register('serviceworker.js')
+          navigator.serviceWorker.register('./serviceworker.js`')
           .then((reg)=> console.log("success: ", reg.scope))
           .catch((err)=> console.log("failure: ", err))
         })
