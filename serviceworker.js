@@ -14,28 +14,45 @@ self.addEventListener('install', (e)=>{
 });
 
 //listen for req
-self.addEventListener('fetch', (e)=>{
+self.addEventListener('fetch', (e) => {
     e.respondWith(
         caches.match(e.request)
-        .then(()=>{
-            return fetch(e.request)
-            .catch(()=> caches.match('offline.html'))
-        })
-    )
-}); 
+            .then((response) => {
+                // If a match is found in cache, return the cached response
+                if (response) {
+                    return response;
+                }
+                // If the request is not found in cache, fetch it from the network
+                return fetch(e.request)
+                    .then((response) => {
+                        // If the fetch is successful, add the response to cache and return it
+                        return caches.open(CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(e.request, response.clone());
+                                return response;
+                            });
+                    })
+                    .catch(() => {
+                        // If the fetch fails, return the offline page from cache
+                        return caches.match('offline.html');
+                    });
+            })
+    );
+});
+
 
 //activate sw
-self.addEventListener('activate', (e)=>{
-    const cacheList = [];
-    cacheList.push(CACHE_NAME);
-
+self.addEventListener('activate', (e) => {
     e.waitUntil(
-        caches.keys().then((cacheNames) => Promise.all(
-            cacheNames.map((cacheNames)=>{
-                if(!cacheList.includes(cacheNames)){
-                    return caches.delete(cacheNames);
-                }
-            })
-        ))
-    )
-})
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+});
+
